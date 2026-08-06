@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GENTAK — Jadwal Lomba Mancing Real-time</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pond:#1E4A3D;
+    --pond-deep:#123028;
+    --pond-light:#2F6B54;
+    --gold:#E8971E;
+    --gold-deep:#B8730E;
+    --red:#D6392B;
+    --red-deep:#9C271D;
+    --paper:#FBF3DE;
+    --paper-deep:#F2E4C2;
+    --ink:#17241D;
+    --ink-soft:#3E4E43;
+    --line:#D8C89C;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Poppins',sans-serif;line-height:1.6;}
+  h1,h2,h3,.display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:0.5px;text-transform:uppercase;line-height:1.05;}
+  .mono{font-family:'Space Mono',monospace;}
+  a{color:inherit;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+
+  nav{background:var(--pond-deep);border-bottom:4px solid var(--gold);}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;max-width:1080px;margin:0 auto;}
+  .logo{color:var(--paper);font-family:'Anton',sans-serif;font-size:22px;text-transform:uppercase;letter-spacing:0.5px;}
+  .logo span{color:var(--gold);}
+  .nav-links{display:flex;gap:28px;list-style:none;margin:0;padding:0;}
+  .nav-links a{color:var(--paper);text-decoration:none;font-size:14px;font-weight:500;opacity:0.85;}
+  .nav-links a:hover{opacity:1;color:var(--gold);}
+  @media(max-width:640px){.nav-links{display:none;}}
+
+  .settings{background:var(--pond-light);border-bottom:2px solid var(--gold-deep);}
+  .settings-inner{max-width:1080px;margin:0 auto;padding:14px 24px;}
+  .settings-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .settings-row input{
+    flex:1;min-width:220px;padding:10px 12px;border-radius:6px;border:1.5px solid transparent;
+    font-family:'Space Mono',monospace;font-size:13px;background:#fff;color:var(--ink);
+  }
+  .settings-row input:focus{outline:2px solid var(--gold);}
+  .settings-row button{
+    padding:10px 18px;border-radius:6px;border:none;background:var(--gold);color:var(--ink);
+    font-weight:700;font-size:13px;cursor:pointer;font-family:'Poppins',sans-serif;
+  }
+  .settings-row button:hover{background:#F5A934;}
+  .status-line{margin-top:8px;font-size:12px;color:#E4F0E9;display:flex;align-items:center;gap:8px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:#8FA69A;flex-shrink:0;}
+  .dot.live{background:#5FD98A;box-shadow:0 0 0 3px rgba(95,217,138,0.25);}
+  .dot.error{background:#E0685C;}
+  .dot.pending{background:var(--gold);}
+  details{margin-top:10px;}
+  summary{color:#E4F0E9;font-size:12px;cursor:pointer;}
+  .help-box{
+    margin-top:10px;background:rgba(23,36,29,0.25);border-radius:8px;padding:14px 16px;
+    font-size:12.5px;color:#E4F0E9;
+  }
+  .help-box code{background:rgba(0,0,0,0.25);padding:1px 6px;border-radius:4px;font-family:'Space Mono',monospace;}
+  .help-box ol{margin:8px 0 0;padding-left:18px;}
+  .help-box li{margin-bottom:6px;}
+
+  .hero{
+    background:var(--pond);
+    background-image:radial-gradient(ellipse at 20% 110%, rgba(232,151,30,0.18), transparent 55%),radial-gradient(ellipse at 90% -10%, rgba(255,255,255,0.06), transparent 45%);
+    color:var(--paper);padding:64px 24px 76px;position:relative;overflow:hidden;border-bottom:6px solid var(--gold);
+  }
+  .hero-inner{max-width:760px;margin:0 auto;text-align:center;position:relative;z-index:2;}
+  .plang{display:inline-block;background:var(--gold);color:var(--ink);font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 16px;border-radius:3px;transform:rotate(-2deg);margin-bottom:22px;}
+  .hero h1{font-size:clamp(36px,7vw,58px);margin:0 0 18px;color:var(--paper);}
+  .hero h1 em{font-style:normal;color:var(--gold);display:block;}
+  .hero p{font-size:17px;color:#D9EAE1;max-width:520px;margin:0 auto 30px;}
+  .stat-strip{max-width:760px;margin:38px auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid rgba(251,243,222,0.2);padding-top:24px;position:relative;z-index:2;}
+  .stat-strip div{text-align:center;border-left:1px solid rgba(251,243,222,0.2);}
+  .stat-strip div:first-child{border-left:none;}
+  .stat-num{font-family:'Anton',sans-serif;font-size:28px;color:var(--gold);}
+  .stat-label{font-size:12px;color:#B9CFC4;text-transform:uppercase;letter-spacing:0.6px;}
+
+  .section{padding:60px 24px;}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-bottom:28px;}
+  .eyebrow{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold-deep);margin-bottom:10px;}
+  .section h2{font-size:clamp(24px,4vw,34px);margin:0 0 8px;color:var(--pond-deep);}
+  .section-desc{color:var(--ink-soft);max-width:560px;font-size:15px;}
+  .refresh-tag{font-family:'Space Mono',monospace;font-size:11px;color:var(--ink-soft);background:var(--paper-deep);border:1px solid var(--line);padding:6px 12px;border-radius:6px;white-space:nowrap;}
+
+  .banner{background:#FCE9CF;border:1.5px solid var(--gold);border-radius:8px;padding:12px 16px;font-size:13px;color:#7A4C08;margin-bottom:24px;}
+
+  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;}
+  .chip{font-family:'Space Mono',monospace;font-size:13px;padding:8px 16px;border-radius:20px;border:1.5px solid var(--pond);background:transparent;color:var(--pond);cursor:pointer;font-weight:700;}
+  .chip.active{background:var(--pond);color:var(--paper);}
+
+  .tickets{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;}
+  .empty-state{border:1.5px dashed var(--line);border-radius:10px;padding:40px 24px;text-align:center;color:var(--ink-soft);font-size:14px;grid-column:1/-1;}
+  .ticket{display:flex;background:#fff;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 3px 0 rgba(23,36,29,0.06);}
+  .ticket-main{flex:1;padding:18px 16px;min-width:0;}
+  .ticket-region{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--gold-deep);text-transform:uppercase;letter-spacing:1px;}
+  .ticket-name{font-family:'Anton',sans-serif;font-size:19px;color:var(--pond-deep);margin:4px 0 8px;text-transform:none;}
+  .ticket-meta{font-size:13px;color:var(--ink-soft);margin:2px 0;}
+  .ticket-meta i{font-style:normal;color:var(--pond);font-weight:600;}
+  .ticket-stub{width:96px;flex-shrink:0;background:var(--paper-deep);border-left:2px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 6px;text-align:center;position:relative;}
+  .ticket-stub::before,.ticket-stub::after{content:"";position:absolute;left:-9px;width:16px;height:16px;background:var(--paper);border-radius:50%;}
+  .ticket-stub::before{top:-8px;}
+  .ticket-stub::after{bottom:-8px;}
+  .ticket-price{font-family:'Space Mono',monospace;font-weight:700;font-size:14px;color:var(--red-deep);}
+  .ticket-status{margin-top:8px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:0.5px;}
+  .status-open{background:#DEEFE3;color:#1F6B44;}
+  .status-few{background:#FCE9CF;color:#9C5F0A;}
+  .status-full{background:#F6DAD7;color:var(--red-deep);}
+
+  .skor{background:var(--pond-deep);color:var(--paper);}
+  .skor .section-desc{color:#B9CFC4;}
+  .board{background:var(--pond);border:6px solid #0D251F;border-radius:8px;padding:24px;}
+  .board-row{display:grid;grid-template-columns:36px 1fr auto;gap:16px;align-items:center;padding:12px 6px;border-bottom:1px dashed rgba(251,243,222,0.18);}
+  .board-row:last-child{border-bottom:none;}
+  .rank{font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);text-align:center;}
+  .board-name{font-weight:600;font-size:15px;}
+  .board-sub{font-size:12px;color:#A9C4B6;}
+  .board-weight{font-family:'Space Mono',monospace;font-weight:700;color:var(--gold);font-size:15px;}
+  .empty-board{color:#B9CFC4;font-size:13px;text-align:center;padding:20px;}
+
+  footer{background:var(--ink);color:#C8D6CD;padding:36px 24px 24px;}
+  .footer-inner{max-width:1080px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;border-bottom:1px solid rgba(251,243,222,0.12);padding-bottom:20px;margin-bottom:16px;}
+  footer .logo{color:var(--paper);}
+  .foot-bottom{font-size:12px;color:#7F9186;max-width:1080px;margin:0 auto;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">GEN<span>TAK</span></div>
+    <ul class="nav-links">
+      <li><a href="#jadwal">Jadwal lomba</a></li>
+      <li><a href="#papan-skor">Papan skor</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="settings">
+  <div class="settings-inner">
+    <div class="settings-row">
+      <input id="sheetInput" type="text" placeholder="Tempel link atau ID Google Sheet kamu di sini…">
+      <button id="connectBtn">Sambungkan sheet</button>
+    </div>
+    <div class="status-line">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">Belum terhubung — menampilkan data contoh di bawah.</span>
+    </div>
+    <details>
+      <summary>Cara menyambungkan Google Sheet kamu</summary>
+      <div class="help-box">
+        Buat satu Google Sheet dengan dua tab bernama persis <code>Jadwal</code> dan <code>PapanSkor</code>.
+        <ol>
+          <li>Tab <code>Jadwal</code> — kolom: <code>Wilayah</code>, <code>Nama Kolam</code>, <code>Jenis Lomba</code>, <code>Kapasitas</code>, <code>Jadwal</code>, <code>Harga Tiket</code>, <code>Status</code> (isi Status dengan: Lapak ada / Sisa dikit / Penuh).</li>
+          <li>Tab <code>PapanSkor</code> — kolom: <code>Nama Pemancing</code>, <code>Kolam</code>, <code>Berat (kg)</code>.</li>
+          <li>Klik <b>Share</b> di kanan atas sheet → ubah akses jadi <b>"Anyone with the link — Viewer"</b>.</li>
+          <li>Salin link sheet-nya, tempel di kotak di atas, lalu klik <b>Sambungkan sheet</b>.</li>
+          <li>Halaman ini otomatis membaca ulang datanya tiap 30 detik — coba ubah angka Status di sheet lalu tunggu, tampilan di bawah akan berubah sendiri.</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="plang">Wilayah percontohan · Depok &amp; sekitarnya</span>
+    <h1>Gentak duluan,<em>baru tahu di mana ada lomba</em></h1>
+    <p>Semua jadwal lomba mancing ikan mas se-Jabodetabek, ditarik langsung dari catatan pengelola kolam — bukan hasil kirim ulang dari grup WA.</p>
+    <div class="stat-strip">
+      <div><div class="stat-num" id="statKolam">–</div><div class="stat-label">Kolam terdaftar</div></div>
+      <div><div class="stat-num" id="statLapak">–</div><div class="stat-label">Lapak tercatat</div></div>
+      <div><div class="stat-num" id="statWilayah">–</div><div class="stat-label">Wilayah tercakup</div></div>
+    </div>
+  </div>
+</header>
+
+<section class="section" id="jadwal">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Jadwal lomba</div>
+        <h2>Cek sebelum berangkat</h2>
+        <p class="section-desc">Data di bawah ini ditarik langsung dari Google Sheet yang kamu sambungkan.</p>
+      </div>
+      <span class="refresh-tag" id="refreshTag">Belum pernah dimuat</span>
+    </div>
+
+    <div class="banner" id="demoBanner">Ini data contoh. Sambungkan Google Sheet kamu di panel atas untuk melihat data asli, real-time.</div>
+
+    <div class="chips" id="chipRow">
+      <button class="chip active" data-wilayah="all">Semua wilayah</button>
+    </div>
+
+    <div class="tickets" id="ticketGrid"></div>
+  </div>
+</section>
+
+<section class="section skor" id="papan-skor">
+  <div class="wrap">
+    <div class="eyebrow" style="color:var(--gold)">Papan skor</div>
+    <h2 style="color:var(--paper)">Ikan terberat minggu ini,<br>lintas kolam</h2>
+    <p class="section-desc">Rekap otomatis dari tab PapanSkor di sheet kamu, diurutkan dari yang terberat.</p>
+    <div class="board" id="boardBody"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="logo">GEN<span>TAK</span></div>
+      <p style="font-size:13px;margin-top:8px;max-width:280px;">Gentak — nama gerakan sentak joran saat ikan menyambar umpan. Dipakai di sini karena semangatnya sama: reaksi cepat begitu ada info lomba baru.</p>
+    </div>
+  </div>
+  <p class="foot-bottom">Versi uji coba — data ditarik langsung dari Google Sheet publik lewat Google Visualization API, tanpa backend tambahan.</p>
+</footer>
+
+<script>
+let SHEET_ID = '';
+let activeWilayah = 'all';
+let jadwalData = [];
+let refreshTimer = null;
+
+const DEMO_JADWAL = [
+  {wilayah:'Depok', 'nama kolam':'Tirta Bambon', 'jenis lomba':'Galapung ikan mas', kapasitas:'48', jadwal:'Buka harian, kecuali Selasa', 'harga tiket':'Rp 150rb', status:'Lapak ada'},
+  {wilayah:'Depok', 'nama kolam':'Boy Fishing', 'jenis lomba':'Lomba pelampungan mas', kapasitas:'90', jadwal:'3x seminggu, sesi sore', 'harga tiket':'Rp 120rb', status:'Sisa dikit'},
+  {wilayah:'Jakarta Selatan', 'nama kolam':'Tentara Langit MBAU', 'jenis lomba':'Galatama ikan mas', kapasitas:'70', jadwal:'Senin & Minggu, 14.00–20.00', 'harga tiket':'Rp 250rb', status:'Lapak ada'},
+  {wilayah:'Jakarta Utara', 'nama kolam':'Galatama PIK', 'jenis lomba':'Galatama ikan mas', kapasitas:'124', jadwal:'Setiap hari', 'harga tiket':'Rp 300rb', status:'Penuh'}
+];
+const DEMO_SKOR = [
+  {'nama pemancing':'Bayu "Sagala" P.', kolam:'Tirta Bambon, Depok', 'berat (kg)':'4.8'},
+  {'nama pemancing':'Roni Paparonz', kolam:'Galatama PIK, Jakarta Utara', 'berat (kg)':'4.3'},
+  {'nama pemancing':'Aham S.', kolam:'Boy Fishing, Depok', 'berat (kg)':'3.9'}
+];
+
+function extractSheetId(input){
+  const trimmed = input.trim();
+  const m = trimmed.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  if(m) return m[1];
+  if(/^[a-zA-Z0-9-_]{20,}$/.test(trimmed)) return trimmed;
+  return null;
+}
+
+function loadSheetJSONP(sheetName){
+  return new Promise((resolve, reject) => {
+    const callbackName = 'gvizCB_' + sheetName.replace(/[^a-zA-Z0-9]/g, '') + '_' + Date.now();
+    const script = document.createElement('script');
+    const timeout = setTimeout(() => { cleanup(); reject(new Error('Waktu tunggu habis (sheet mungkin belum publik, atau nama tab salah)')); }, 10000);
+    function cleanup(){
+      clearTimeout(timeout);
+      delete window[callbackName];
+      if(script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[callbackName] = function(json){
+      cleanup();
+      if(json.status === 'error'){
+        const msg = (json.errors && json.errors[0] && json.errors[0].detailed_message) || 'Sheet/tab tidak ditemukan';
+        reject(new Error(msg));
+        return;
+      }
+      resolve(json);
+    };
+    script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:${callbackName}&sheet=${encodeURIComponent(sheetName)}`;
+    script.onerror = () => { cleanup(); reject(new Error('Sheet tidak bisa diakses — cek ID sheet dan status share-nya')); };
+    document.body.appendChild(script);
+  });
+}
+
+async function fetchTab(sheetName){
+  const json = await loadSheetJSONP(sheetName);
+  const cols = json.table.cols.map(c => (c.label || '').trim().toLowerCase());
+  return json.table.rows.filter(r => r.c).map(r => {
+    const obj = {};
+    cols.forEach((col, i) => {
+      const cell = r.c[i];
+      obj[col] = cell ? (cell.f !== undefined && cell.f !== null ? cell.f : (cell.v !== null ? cell.v : '')) : '';
+    });
+    return obj;
+  });
+}
+
+function statusClass(status){
+  const s = (status || '').toLowerCase();
+  if(s.includes('penuh')) return 'status-full';
+  if(s.includes('sisa') || s.includes('dikit')) return 'status-few';
+  return 'status-open';
+}
+
+function renderChips(rows){
+  const wilayahs = [...new Set(rows.map(r => r.wilayah).filter(Boolean))];
+  const chipRow = document.getElementById('chipRow');
+  chipRow.innerHTML = '';
+  const allChip = document.createElement('button');
+  allChip.className = 'chip' + (activeWilayah === 'all' ? ' active' : '');
+  allChip.textContent = 'Semua wilayah';
+  allChip.dataset.wilayah = 'all';
+  chipRow.appendChild(allChip);
+  wilayahs.forEach(w => {
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (activeWilayah === w ? ' active' : '');
+    chip.textContent = w;
+    chip.dataset.wilayah = w;
+    chipRow.appendChild(chip);
+  });
+  chipRow.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      activeWilayah = chip.dataset.wilayah;
+      renderTickets(jadwalData);
+      chipRow.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+}
+
+function renderTickets(rows){
+  const grid = document.getElementById('ticketGrid');
+  const filtered = activeWilayah === 'all' ? rows : rows.filter(r => r.wilayah === activeWilayah);
+  if(filtered.length === 0){
+    grid.innerHTML = '<div class="empty-state">Belum ada jadwal untuk wilayah ini. Tambahkan baris baru di tab Jadwal pada sheet kamu.</div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(r => `
+    <div class="ticket">
+      <div class="ticket-main">
+        <div class="ticket-region">${r.wilayah || '-'}</div>
+        <div class="ticket-name">${r['nama kolam'] || '-'}</div>
+        <div class="ticket-meta"><i>${r['jenis lomba'] || '-'}</i>${r.kapasitas ? ' · ' + r.kapasitas + ' lapak' : ''}</div>
+        <div class="ticket-meta">${r.jadwal || '-'}</div>
+      </div>
+      <div class="ticket-stub">
+        <div class="ticket-price">${r['harga tiket'] || '-'}</div>
+        <div class="ticket-status ${statusClass(r.status)}">${r.status || '-'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderStats(rows){
+  const kolamCount = rows.length;
+  const lapakTotal = rows.reduce((sum, r) => sum + (parseInt(r.kapasitas) || 0), 0);
+  const wilayahCount = new Set(rows.map(r => r.wilayah).filter(Boolean)).size;
+  document.getElementById('statKolam').textContent = kolamCount;
+  document.getElementById('statLapak').textContent = lapakTotal || '–';
+  document.getElementById('statWilayah').textContent = wilayahCount;
+}
+
+function renderBoard(rows){
+  const body = document.getElementById('boardBody');
+  if(!rows || rows.length === 0){
+    body.innerHTML = '<div class="empty-board">Belum ada data di tab PapanSkor.</div>';
+    return;
+  }
+  const sorted = [...rows].sort((a, b) => (parseFloat(b['berat (kg)']) || 0) - (parseFloat(a['berat (kg)']) || 0)).slice(0, 5);
+  body.innerHTML = sorted.map((r, i) => `
+    <div class="board-row">
+      <div class="rank">${String(i + 1).padStart(2, '0')}</div>
+      <div><div class="board-name">${r['nama pemancing'] || '-'}</div><div class="board-sub">${r.kolam || '-'}</div></div>
+      <div class="board-weight">${r['berat (kg)'] ? r['berat (kg)'] + ' kg' : '-'}</div>
+    </div>
+  `).join('');
+}
+
+function setStatus(state, message){
+  const dot = document.getElementById('statusDot');
+  dot.className = 'dot' + (state ? ' ' + state : '');
+  document.getElementById('statusText').textContent = message;
+}
+
+function renderAll(jadwal, skor, isDemo){
+  jadwalData = jadwal;
+  document.getElementById('demoBanner').style.display = isDemo ? 'block' : 'none';
+  renderChips(jadwal);
+  renderTickets(jadwal);
+  renderStats(jadwal);
+  renderBoard(skor);
+}
+
+async function loadFromSheet(){
+  setStatus('pending', 'Memuat data dari Google Sheet…');
+  document.getElementById('connectBtn').textContent = 'Menghubungkan…';
+  try{
+    const [jadwal, skor] = await Promise.all([fetchTab('Jadwal'), fetchTab('PapanSkor')]);
+    renderAll(jadwal, skor, false);
+    const now = new Date().toLocaleTimeString('id-ID');
+    document.getElementById('refreshTag').textContent = 'Terakhir diperbarui: ' + now;
+    setStatus('live', 'Terhubung — memuat ulang otomatis tiap 30 detik.');
+  }catch(err){
+    console.error('GENTAK gagal memuat sheet:', err);
+    setStatus('error', 'Gagal memuat (' + err.message + '). Cek: sheet dibagikan sebagai "Anyone with the link", dan nama tab persis "Jadwal" & "PapanSkor".');
+  }
+  document.getElementById('connectBtn').textContent = 'Sambungkan sheet';
+}
+
+document.getElementById('connectBtn').addEventListener('click', () => {
+  const input = document.getElementById('sheetInput').value;
+  const id = extractSheetId(input);
+  if(!id){
+    setStatus('error', 'Link atau ID sheet belum valid. Salin dari address bar Google Sheets kamu.');
+    return;
+  }
+  SHEET_ID = id;
+  if(refreshTimer) clearInterval(refreshTimer);
+  loadFromSheet();
+  refreshTimer = setInterval(loadFromSheet, 30000);
+});
+
+document.getElementById('sheetInput').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') document.getElementById('connectBtn').click();
+});
+
+renderAll(DEMO_JADWAL, DEMO_SKOR, true);
+document.getElementById('refreshTag').textContent = 'Data contoh, belum tersambung';
+</script>
+</body>
+</html>
