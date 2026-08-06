@@ -340,12 +340,12 @@ function renderBoard(rows){
     body.innerHTML = '<div class="empty-board">Belum ada data di tab PapanSkor.</div>';
     return;
   }
-  const sorted = [...rows].sort((a, b) => (parseFloat(b['berat (kg)']) || 0) - (parseFloat(a['berat (kg)']) || 0)).slice(0, 5);
+  const sorted = [...rows].sort((a, b) => (parseFloat(b['Berat (kg)']) || 0) - (parseFloat(a['Berat (kg)']) || 0)).slice(0, 5);
   body.innerHTML = sorted.map((r, i) => `
     <div class="board-row">
       <div class="rank">${String(i + 1).padStart(2, '0')}</div>
-      <div><div class="board-name">${r['nama pemancing'] || '-'}</div><div class="board-sub">${r.kolam || '-'}</div></div>
-      <div class="board-weight">${r['berat (kg)'] ? r['berat (kg)'] + ' kg' : '-'}</div>
+      <div><div class="board-name">${r['Nama Pemancing'] || '-'}</div><div class="board-sub">${r.Kolam || '-'}</div></div>
+      <div class="board-weight">${r['Berat (kg)'] ? r['Berat (kg)'] + ' kg' : '-'}</div>
     </div>
   `).join('');
 }
