@@ -248,11 +248,11 @@ function extractSheetId(input){
 }
 
 function gvizUrl(sheetName){
-  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+  return `https://docs.google.com/spreadsheets/d/${16jsHjO8Nh7bLHIKeRnJ4OeMd7Mdwg-NKw9q6BaP90s4}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent("Jadwal")}`;
 }
 
 async function fetchTab(sheetName){
-  const res = await fetch(gvizUrl(sheetName));
+  const res = await fetch(gvizUrl("PapanSkor"));
   if(!res.ok) throw new Error('network');
   const text = await res.text();
   const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
