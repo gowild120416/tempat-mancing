@@ -170,7 +170,7 @@
 
 <header class="hero">
   <div class="hero-inner">
-    <span class="plang">Wilayah percontohan · Depok &amp; sekitarnya</span>
+    <span class="plang">Wilayah percontohan · Cibinong &amp; sekitarnya</span>
     <h1>Gentak duluan,<em>baru tahu di mana ada lomba</em></h1>
     <p>Semua jadwal lomba mancing ikan mas se-Jabodetabek, ditarik langsung dari catatan pengelola kolam — bukan hasil kirim ulang dari grup WA.</p>
     <div class="stat-strip">
@@ -248,11 +248,11 @@ function extractSheetId(input){
 }
 
 function gvizUrl(sheetName){
-  return `https://docs.google.com/spreadsheets/d/${16jsHjO8Nh7bLHIKeRnJ4OeMd7Mdwg-NKw9q6BaP90s4}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent("Jadwal")}`;
+  return `https://docs.google.com/spreadsheets/d/${16jsHjO8Nh7bLHIKeRnJ4OeMd7Mdwg-NKw9q6BaP90s4}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetname)}`;
 }
 
 async function fetchTab(sheetName){
-  const res = await fetch(gvizUrl("PapanSkor"));
+  const res = await fetch(gvizUrl(sheetname));
   if(!res.ok) throw new Error('network');
   const text = await res.text();
   const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
